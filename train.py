@@ -254,8 +254,8 @@ def main(unused_argv):
   FLAGS.n_token = data_utils.VOCAB_SIZE
   tf.compat.v1.logging.info("n_token {}".format(FLAGS.n_token))
 
-  if not tf.gfile.Exists(FLAGS.model_dir):
-    tf.gfile.MakeDirs(FLAGS.model_dir)
+  if not tf.io.gfile.Exists(FLAGS.model_dir):
+    tf.io.gfile.MakeDirs(FLAGS.model_dir)
 
   # Get train input function
   train_input_fn, train_record_info_dict = get_input_fn("train")

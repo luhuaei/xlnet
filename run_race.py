@@ -245,9 +245,9 @@ def get_examples(data_dir, set_type):
     if level == "high" and FLAGS.middle_only: continue
 
     cur_dir = os.path.join(data_dir, set_type, level)
-    for filename in tf.gfile.ListDirectory(cur_dir):
+    for filename in tf.io.gfile.ListDirectory(cur_dir):
       cur_path = os.path.join(cur_dir, filename)
-      with tf.gfile.Open(cur_path) as f:
+      with tf.io.gfile.Open(cur_path) as f:
         cur_data = json.load(f)
 
         answers = cur_data["answers"]
@@ -276,7 +276,7 @@ def get_examples(data_dir, set_type):
 
 
 def file_based_convert_examples_to_features(examples, tokenize_fn, output_file):
-  if tf.gfile.Exists(output_file) and not FLAGS.overwrite_data:
+  if tf.io.gfile.Exists(output_file) and not FLAGS.overwrite_data:
     return
 
   tf.compat.v1.logging.info("Start writing tfrecord %s.", output_file)
@@ -453,8 +453,8 @@ def main(_):
     raise ValueError(
         "At least one of `do_train` or `do_eval` must be True.")
 
-  if not tf.gfile.Exists(FLAGS.output_dir):
-    tf.gfile.MakeDirs(FLAGS.output_dir)
+  if not tf.io.gfile.Exists(FLAGS.output_dir):
+    tf.io.gfile.MakeDirs(FLAGS.output_dir)
 
   sp = spm.SentencePieceProcessor()
   sp.Load(FLAGS.spiece_model_file)
@@ -488,7 +488,7 @@ def main(_):
         spm_basename, FLAGS.max_seq_length)
     train_file = os.path.join(FLAGS.output_dir, train_file_base)
 
-    if not tf.gfile.Exists(train_file) or FLAGS.overwrite_data:
+    if not tf.io.gfile.Exists(train_file) or FLAGS.overwrite_data:
       train_examples = get_examples(FLAGS.data_dir, "train")
       random.shuffle(train_examples)
       file_based_convert_examples_to_features(

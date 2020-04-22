@@ -232,7 +232,7 @@ class InputFeatures(object):
 
 def read_squad_examples(input_file, is_training):
   """Read a SQuAD json file into a list of SquadExample."""
-  with tf.gfile.Open(input_file, "r") as reader:
+  with tf.io.gfile.Open(input_file, "r") as reader:
     input_data = json.load(reader)["data"]
 
   examples = []
@@ -863,13 +863,13 @@ def write_predictions(all_examples, all_features, all_results, n_best_size,
 
     all_nbest_json[example.qas_id] = nbest_json
 
-  with tf.gfile.GFile(output_prediction_file, "w") as writer:
+  with tf.io.gfile.GFile(output_prediction_file, "w") as writer:
     writer.write(json.dumps(all_predictions, indent=4) + "\n")
 
-  with tf.gfile.GFile(output_nbest_file, "w") as writer:
+  with tf.io.gfile.GFile(output_nbest_file, "w") as writer:
     writer.write(json.dumps(all_nbest_json, indent=4) + "\n")
 
-  with tf.gfile.GFile(output_null_log_odds_file, "w") as writer:
+  with tf.io.gfile.GFile(output_null_log_odds_file, "w") as writer:
     writer.write(json.dumps(scores_diff_json, indent=4) + "\n")
 
   qid_to_has_ans = squad_utils.make_qid_to_has_ans(orig_data)
@@ -938,7 +938,7 @@ def input_fn_builder(input_glob, seq_length, is_training, drop_remainder,
     name_to_features["is_impossible"] = tf.FixedLenFeature([], tf.float32)
 
   tf.compat.v1.logging.info("Input tfrecord file glob {}".format(input_glob))
-  global_input_paths = tf.gfile.Glob(input_glob)
+  global_input_paths = tf.io.gfile.Glob(input_glob)
   tf.compat.v1.logging.info("Find {} input paths {}".format(
       len(global_input_paths), global_input_paths))
 
@@ -1151,8 +1151,8 @@ def preprocess():
 def main(_):
   tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
 
-  if not tf.gfile.Exists(FLAGS.output_dir):
-    tf.gfile.MakeDirs(FLAGS.output_dir)
+  if not tf.io.gfile.Exists(FLAGS.output_dir):
+    tf.io.gfile.MakeDirs(FLAGS.output_dir)
 
   if FLAGS.do_prepro:
     preprocess()
@@ -1166,8 +1166,8 @@ def main(_):
     raise ValueError(
         "At least one of `do_train` and `do_predict` must be True.")
 
-  if FLAGS.do_predict and not tf.gfile.Exists(FLAGS.predict_dir):
-    tf.gfile.MakeDirs(FLAGS.predict_dir)
+  if FLAGS.do_predict and not tf.io.gfile.Exists(FLAGS.predict_dir):
+    tf.io.gfile.MakeDirs(FLAGS.predict_dir)
 
   sp_model = spm.SentencePieceProcessor()
   sp_model.Load(FLAGS.spiece_model_file)
@@ -1211,7 +1211,7 @@ def main(_):
   if FLAGS.do_predict:
     eval_examples = read_squad_examples(FLAGS.predict_file, is_training=False)
 
-    with tf.gfile.Open(FLAGS.predict_file) as f:
+    with tf.io.gfile.Open(FLAGS.predict_file) as f:
       orig_data = json.load(f)["data"]
 
     eval_rec_file = os.path.join(
@@ -1223,10 +1223,10 @@ def main(_):
         "{}.slen-{}.qlen-{}.eval.features.pkl".format(
             spm_basename, FLAGS.max_seq_length, FLAGS.max_query_length))
 
-    if tf.gfile.Exists(eval_rec_file) and tf.gfile.Exists(
+    if tf.io.gfile.Exists(eval_rec_file) and tf.io.gfile.Exists(
         eval_feature_file) and not FLAGS.overwrite_data:
       tf.compat.v1.logging.info("Loading eval features from {}".format(eval_feature_file))
-      with tf.gfile.Open(eval_feature_file, 'rb') as fin:
+      with tf.io.gfile.Open(eval_feature_file, 'rb') as fin:
         eval_features = pickle.load(fin)
     else:
       eval_writer = FeatureWriter(filename=eval_rec_file, is_training=False)
@@ -1246,7 +1246,7 @@ def main(_):
           output_fn=append_feature)
       eval_writer.close()
 
-      with tf.gfile.Open(eval_feature_file, 'wb') as fout:
+      with tf.io.gfile.Open(eval_feature_file, 'wb') as fout:
         pickle.dump(eval_features, fout)
 
     eval_input_fn = input_fn_builder(
