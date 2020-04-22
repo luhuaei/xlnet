@@ -912,4 +912,4 @@ if __name__ == "__main__":
                        "using multiple workers to identify each worker.")
 
   tf.logging.set_verbosity(tf.logging.INFO)
-  tf.app.run(create_data)
+  tf.compat.v1.app.run(create_data)
