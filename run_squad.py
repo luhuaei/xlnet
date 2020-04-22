@@ -322,7 +322,7 @@ def convert_examples_to_features(examples, sp_model, max_seq_length,
   for (example_index, example) in enumerate(examples):
 
     if example_index % 100 == 0:
-      tf.logging.info('Converting {}/{} pos {} neg {}'.format(
+      tf.compat.v1.logging.info('Converting {}/{} pos {} neg {}'.format(
           example_index, len(examples), cnt_pos, cnt_neg))
 
     query_tokens = encode_ids(
@@ -564,33 +564,33 @@ def convert_examples_to_features(examples, sp_model, max_seq_length,
         end_position = cls_index
 
       if example_index < 20:
-        tf.logging.info("*** Example ***")
-        tf.logging.info("unique_id: %s" % (unique_id))
-        tf.logging.info("example_index: %s" % (example_index))
-        tf.logging.info("doc_span_index: %s" % (doc_span_index))
-        tf.logging.info("tok_start_to_orig_index: %s" % " ".join(
+        tf.compat.v1.logging.info("*** Example ***")
+        tf.compat.v1.logging.info("unique_id: %s" % (unique_id))
+        tf.compat.v1.logging.info("example_index: %s" % (example_index))
+        tf.compat.v1.logging.info("doc_span_index: %s" % (doc_span_index))
+        tf.compat.v1.logging.info("tok_start_to_orig_index: %s" % " ".join(
             [str(x) for x in cur_tok_start_to_orig_index]))
-        tf.logging.info("tok_end_to_orig_index: %s" % " ".join(
+        tf.compat.v1.logging.info("tok_end_to_orig_index: %s" % " ".join(
             [str(x) for x in cur_tok_end_to_orig_index]))
-        tf.logging.info("token_is_max_context: %s" % " ".join([
+        tf.compat.v1.logging.info("token_is_max_context: %s" % " ".join([
             "%d:%s" % (x, y) for (x, y) in six.iteritems(token_is_max_context)
         ]))
-        tf.logging.info("input_ids: %s" % " ".join([str(x) for x in input_ids]))
-        tf.logging.info(
+        tf.compat.v1.logging.info("input_ids: %s" % " ".join([str(x) for x in input_ids]))
+        tf.compat.v1.logging.info(
             "input_mask: %s" % " ".join([str(x) for x in input_mask]))
-        tf.logging.info(
+        tf.compat.v1.logging.info(
             "segment_ids: %s" % " ".join([str(x) for x in segment_ids]))
 
         if is_training and span_is_impossible:
-          tf.logging.info("impossible example span")
+          tf.compat.v1.logging.info("impossible example span")
 
         if is_training and not span_is_impossible:
           pieces = [sp_model.IdToPiece(token) for token in
                     tokens[start_position: (end_position + 1)]]
           answer_text = sp_model.DecodePieces(pieces)
-          tf.logging.info("start_position: %d" % (start_position))
-          tf.logging.info("end_position: %d" % (end_position))
-          tf.logging.info(
+          tf.compat.v1.logging.info("start_position: %d" % (start_position))
+          tf.compat.v1.logging.info("end_position: %d" % (end_position))
+          tf.compat.v1.logging.info(
               "answer: %s" % (printable_text(answer_text)))
 
           # note(zhiliny): With multi processing,
@@ -628,7 +628,7 @@ def convert_examples_to_features(examples, sp_model, max_seq_length,
       else:
         cnt_pos += 1
 
-  tf.logging.info("Total number of instances: {} = pos {} neg {}".format(
+  tf.compat.v1.logging.info("Total number of instances: {} = pos {} neg {}".format(
       cnt_pos + cnt_neg, cnt_pos, cnt_neg))
 
 
@@ -732,8 +732,8 @@ def write_predictions(all_examples, all_features, all_results, n_best_size,
                       output_nbest_file,
                       output_null_log_odds_file, orig_data):
   """Write final predictions to the json file and log-odds of null if needed."""
-  tf.logging.info("Writing predictions to: %s" % (output_prediction_file))
-  # tf.logging.info("Writing nbest to: %s" % (output_nbest_file))
+  tf.compat.v1.logging.info("Writing predictions to: %s" % (output_prediction_file))
+  # tf.compat.v1.logging.info("Writing nbest to: %s" % (output_nbest_file))
 
   example_index_to_features = collections.defaultdict(list)
   for feature in all_features:
@@ -937,9 +937,9 @@ def input_fn_builder(input_glob, seq_length, is_training, drop_remainder,
     name_to_features["end_positions"] = tf.FixedLenFeature([], tf.int64)
     name_to_features["is_impossible"] = tf.FixedLenFeature([], tf.float32)
 
-  tf.logging.info("Input tfrecord file glob {}".format(input_glob))
+  tf.compat.v1.logging.info("Input tfrecord file glob {}".format(input_glob))
   global_input_paths = tf.gfile.Glob(input_glob)
-  tf.logging.info("Find {} input paths {}".format(
+  tf.compat.v1.logging.info("Find {} input paths {}".format(
       len(global_input_paths), global_input_paths))
 
   def _decode_record(record, name_to_features):
@@ -974,7 +974,7 @@ def input_fn_builder(input_glob, seq_length, is_training, drop_remainder,
         my_start_file_id = host_id * num_files_per_host
         my_end_file_id = min((host_id + 1) * num_files_per_host, num_files)
         input_paths = global_input_paths[my_start_file_id: my_end_file_id]
-      tf.logging.info("Host {} handles {} files".format(host_id,
+      tf.compat.v1.logging.info("Host {} handles {} files".format(host_id,
                                                         len(input_paths)))
     else:
       input_paths = global_input_paths
@@ -1027,14 +1027,14 @@ def get_model_fn():
 
     #### Check model parameters
     num_params = sum([np.prod(v.shape) for v in tf.trainable_variables()])
-    tf.logging.info('#params: {}'.format(num_params))
+    tf.compat.v1.logging.info('#params: {}'.format(num_params))
 
     scaffold_fn = None
 
     #### Evaluation mode
     if mode == tf.estimator.ModeKeys.PREDICT:
       if FLAGS.init_checkpoint:
-        tf.logging.info("init_checkpoint not being used in predict mode.")
+        tf.compat.v1.logging.info("init_checkpoint not being used in predict mode.")
 
       predictions = {
           "unique_ids": features["unique_ids"],
@@ -1125,7 +1125,7 @@ def preprocess():
           spm_basename, FLAGS.proc_id, FLAGS.max_seq_length,
           FLAGS.max_query_length))
 
-  tf.logging.info("Read examples from {}".format(FLAGS.train_file))
+  tf.compat.v1.logging.info("Read examples from {}".format(FLAGS.train_file))
   train_examples = read_squad_examples(FLAGS.train_file, is_training=True)
   train_examples = train_examples[FLAGS.proc_id::FLAGS.num_proc]
 
@@ -1133,7 +1133,7 @@ def preprocess():
   # buffer in the `input_fn`.
   random.shuffle(train_examples)
 
-  tf.logging.info("Write to {}".format(train_rec_file))
+  tf.compat.v1.logging.info("Write to {}".format(train_rec_file))
   train_writer = FeatureWriter(
       filename=train_rec_file,
       is_training=True)
@@ -1149,7 +1149,7 @@ def preprocess():
 
 
 def main(_):
-  tf.logging.set_verbosity(tf.logging.INFO)
+  tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
 
   if not tf.gfile.Exists(FLAGS.output_dir):
     tf.gfile.MakeDirs(FLAGS.output_dir)
@@ -1225,7 +1225,7 @@ def main(_):
 
     if tf.gfile.Exists(eval_rec_file) and tf.gfile.Exists(
         eval_feature_file) and not FLAGS.overwrite_data:
-      tf.logging.info("Loading eval features from {}".format(eval_feature_file))
+      tf.compat.v1.logging.info("Loading eval features from {}".format(eval_feature_file))
       with tf.gfile.Open(eval_feature_file, 'rb') as fin:
         eval_features = pickle.load(fin)
     else:
@@ -1262,7 +1262,7 @@ def main(_):
         yield_single_examples=True):
 
       if len(cur_results) % 1000 == 0:
-        tf.logging.info("Processing example: %d" % (len(cur_results)))
+        tf.compat.v1.logging.info("Processing example: %d" % (len(cur_results)))
 
       unique_id = int(result["unique_ids"])
       start_top_log_probs = (
@@ -1298,12 +1298,12 @@ def main(_):
                             orig_data)
 
     # Log current result
-    tf.logging.info("=" * 80)
+    tf.compat.v1.logging.info("=" * 80)
     log_str = "Result | "
     for key, val in ret.items():
       log_str += "{} {} | ".format(key, val)
-    tf.logging.info(log_str)
-    tf.logging.info("=" * 80)
+    tf.compat.v1.logging.info(log_str)
+    tf.compat.v1.logging.info("=" * 80)
 
 
 if __name__ == "__main__":

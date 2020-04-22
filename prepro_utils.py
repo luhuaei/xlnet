@@ -12,7 +12,7 @@ SPIECE_UNDERLINE = '▁'
 
 
 def printable_text(text):
-  """Returns text encoded in a way suitable for print or `tf.logging`."""
+  """Returns text encoded in a way suitable for print or `tf.compat.v1.logging`."""
 
   # These functions want `str` for both Python2 and Python3, but in one case
   # it's a Unicode string and in the other it's a byte string.
@@ -135,4 +135,3 @@ if __name__ == '__main__':
   print_('ORIGINAL', sp.EncodeAsPieces('I was born in 92000, and this is falsé.'))
   print_('OURS', encode_pieces(sp, 'I was born in 92000, and this is falsé.'))
   print(encode_ids(sp, 'I was born in 92000, and this is falsé.'))
-

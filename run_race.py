@@ -279,12 +279,12 @@ def file_based_convert_examples_to_features(examples, tokenize_fn, output_file):
   if tf.gfile.Exists(output_file) and not FLAGS.overwrite_data:
     return
 
-  tf.logging.info("Start writing tfrecord %s.", output_file)
+  tf.compat.v1.logging.info("Start writing tfrecord %s.", output_file)
   writer = tf.python_io.TFRecordWriter(output_file)
 
   for ex_index, example in enumerate(examples):
     if ex_index % 10000 == 0:
-      tf.logging.info("Writing example %d of %d" % (ex_index, len(examples)))
+      tf.compat.v1.logging.info("Writing example %d of %d" % (ex_index, len(examples)))
 
     feature = convert_single_example(example, tokenize_fn)
 
@@ -321,7 +321,7 @@ def file_based_input_fn_builder(input_file, seq_length, is_training,
       "is_real_example": tf.FixedLenFeature([], tf.int64),
   }
 
-  tf.logging.info("Input tfrecord file {}".format(input_file))
+  tf.compat.v1.logging.info("Input tfrecord file {}".format(input_file))
 
   def _decode_record(record, name_to_features):
     """Decodes a record to a TensorFlow example."""
@@ -375,7 +375,7 @@ def get_model_fn():
 
     #### Check model parameters
     num_params = sum([np.prod(v.shape) for v in tf.trainable_variables()])
-    tf.logging.info('#params: {}'.format(num_params))
+    tf.compat.v1.logging.info('#params: {}'.format(num_params))
 
     #### load pretrained models
     scaffold_fn = model_utils.init_from_checkpoint(FLAGS)
@@ -443,7 +443,7 @@ def get_model_fn():
 
 
 def main(_):
-  tf.logging.set_verbosity(tf.logging.INFO)
+  tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
 
   #### Validate flags
   if FLAGS.save_steps is not None:
@@ -503,7 +503,7 @@ def main(_):
 
   if FLAGS.do_eval:
     eval_examples = get_examples(FLAGS.data_dir, FLAGS.eval_split)
-    tf.logging.info("Num of eval samples: {}".format(len(eval_examples)))
+    tf.compat.v1.logging.info("Num of eval samples: {}".format(len(eval_examples)))
 
     # TPU requires a fixed batch size for all batches, therefore the number
     # of examples must be a multiple of the batch size, or else examples
@@ -542,12 +542,12 @@ def main(_):
         steps=eval_steps)
 
     # Log current result
-    tf.logging.info("=" * 80)
+    tf.compat.v1.logging.info("=" * 80)
     log_str = "Eval | "
     for key, val in ret.items():
       log_str += "{} {} | ".format(key, val)
-    tf.logging.info(log_str)
-    tf.logging.info("=" * 80)
+    tf.compat.v1.logging.info(log_str)
+    tf.compat.v1.logging.info("=" * 80)
 
 
 if __name__ == "__main__":

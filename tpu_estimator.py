@@ -66,7 +66,7 @@ from tensorflow.python.ops import state_ops
 from tensorflow.python.ops import summary_ops_v2 as contrib_summary
 from tensorflow.python.ops import variable_scope
 from tensorflow.python.ops import variables
-from tensorflow.python.platform import tf_logging as logging
+from tensorflow.python.platform import tf.compat.v1.logging as logging
 from tensorflow.python.saved_model import tag_constants
 from tensorflow.python.summary import summary
 from tensorflow.python.training import basic_session_run_hooks
