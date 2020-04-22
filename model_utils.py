@@ -396,4 +396,4 @@ if __name__ == "__main__":
 
   FLAGS = flags.FLAGS
 
-  tf.app.run(clean_ckpt)
+  tf.compat.v1.app.run(clean_ckpt)
